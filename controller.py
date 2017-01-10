@@ -2,20 +2,27 @@ from microbit import *
 from neopixel import NeoPixel
 import radio
 
-# this code will run on the 'master' microbit which manages the lights, etc
-
 LIGHTS = 30
-COLORS = [(255, 0, 0)] * 9 + [(0, 0, 255)] * 10 + [(0, 255, 0)] * 11
+MAX_SPEED = 4500
 
+def get_light_color(pixel):
+	if pixel < 8 :
+		return (255, 0, 0)
+	elif pixel < 16:
+		return (255, 255, 0)
+	elif pixel < 26:
+		return (0, 255, 0)
+	else:
+		return (0, 0, 255)
 
-def light_percent(np, percent, colors):
+def light_percent(np, percent):
 	length = len(np)
 	number_on = min(int(percent / 100 * length), length)
-	print('turning', number_on, 'lights on')
 	np.clear()
 
 	for pixel in range(number_on):
-		np[pixel] = colors[pixel]
+		np[pixel] = get_light_color(pixel)
+
 	np.show()
 
 
@@ -28,6 +35,6 @@ while True:
 	if not message:
 		continue
 
-	speed = int(message) // 400
-	print(speed)
-	light_percent(np, speed, COLORS)
+	speed = min(int(message), MAX_SPEED) / MAX_SPEED * 100
+	print(message, '->', speed)
+	light_percent(np, speed)

@@ -20,7 +20,7 @@ color_thresholds = [
 	(25, (0, 100, 10)),
 	(26, (0, 100, 50)),
 	(27, (0, 75, 100)),
-	(30, (0, 0, 100))
+	(30, (0, 90, 100))
 ]
 
 def get_light_color(pixel):
@@ -40,7 +40,7 @@ def light_percent(np, percent):
 
 def format_score(milliseconds):
 	seconds = milliseconds // 1000
-	return '{:d}s'.format(seconds)
+	return '{:d}'.format(seconds)
 
 radio.on()
 radio.config(channel=97)
@@ -49,6 +49,7 @@ np = NeoPixel(pin0, LIGHTS)
 best_time = 0
 start_time = 0
 moving_average = 0
+prev_time = 0
 
 while True:
 	try:
@@ -64,11 +65,14 @@ while True:
 
 	percentage = moving_average / MAX_SPEED * 100
 	kmh = percentage * 50
-	print('travelling at', kmh, 'km/h')
+
+	if kmh > 0:
+		print('travelling at', kmh, 'km/h')
 
 	if moving_average != 0.0:
 		print(message, '->', moving_average)
-		light_percent(np, percentage)
+
+	light_percent(np, percentage)
 
 	if speed > SCORE_THRESHOLD and start_time == -1:
 		start_time = running_time()
@@ -77,8 +81,12 @@ while True:
 		score = running_time() - start_time
 		best_time = max(score, best_time)
 		start_time = -1
-		display.scroll(format_score(best_time), wait=False, loop=True)
+		display.show(format_score(best_time), wait=False, loop=True)
 
 	if start_time != -1:
-		print('time: ' + format_score(score))
+		current_time = int(running_time() - start_time // 1000)
+		if current_time != prev_time:
+			display.show(str(current_time) + '  ', wait=False)
+
+		print('time: ' + str(current_time))
 		print('best time: ' + format_score(best_time))

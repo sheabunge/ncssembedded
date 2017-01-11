@@ -3,7 +3,8 @@ from neopixel import NeoPixel
 import radio
 
 LIGHTS = 30
-MAX_SPEED = 4500
+MAX_SPEED = 3500
+SCORE_THRESHOLD = 50
 
 def get_light_color(pixel):
 	color_thresholds = [
@@ -31,6 +32,8 @@ radio.on()
 radio.config(channel=97)
 np = NeoPixel(pin0, LIGHTS)
 
+moving_average = 0
+
 while True:
 	try:
 		message = radio.receive()
@@ -40,6 +43,13 @@ while True:
 	if not message:
 		continue
 
-	speed = min(int(message), MAX_SPEED) / MAX_SPEED * 100
-	print(message, '->', speed)
-	light_percent(np, speed)
+	speed = min(int(message), MAX_SPEED)
+	moving_average = moving_average * .4 + speed * .6
+
+	percentage = moving_average / MAX_SPEED * 100
+	kmh = percentage * 50
+	print('travelling at', kmh, 'km/h')
+
+	if moving_average != 0.0:
+		print(message, '->', moving_average)
+		light_percent(np, percentage)

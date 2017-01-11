@@ -32,7 +32,11 @@ radio.config(channel=97)
 np = NeoPixel(pin0, LIGHTS)
 
 while True:
-	message = radio.receive()
+	try:
+		message = radio.receive()
+	except Exception as err:
+		print(err)
+		continue
 	if not message:
 		continue
 

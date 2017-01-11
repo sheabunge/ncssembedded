@@ -28,10 +28,17 @@ def light_percent(np, percent):
 		np[pixel] = get_light_color(pixel) if pixel < number_on else (0, 0, 0)
 	np.show()
 
+
+def format_score(milliseconds):
+	seconds = milliseconds // 1000
+	return '{:d}s'.format(seconds)
+
 radio.on()
 radio.config(channel=97)
 np = NeoPixel(pin0, LIGHTS)
 
+best_time = 0
+start_time = 0
 moving_average = 0
 
 while True:
@@ -53,3 +60,16 @@ while True:
 	if moving_average != 0.0:
 		print(message, '->', moving_average)
 		light_percent(np, percentage)
+
+	if speed > SCORE_THRESHOLD and start_time == -1:
+		start_time = running_time()
+
+	if speed < SCORE_THRESHOLD and start_time != -1:
+		score = running_time() - start_time
+		best_time = max(score, best_time)
+		start_time = -1
+		display.scroll(format_score(best_time), wait=False, loop=True)
+
+	if start_time != -1:
+		print('time: ' + format_score(score))
+		print('best time: ' + format_score(best_time))

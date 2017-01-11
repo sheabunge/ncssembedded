@@ -6,18 +6,27 @@ LIGHTS = 30
 MAX_SPEED = 3500
 SCORE_THRESHOLD = 50
 
-def get_light_color(pixel):
-	color_thresholds = [
-		(8,  (100, 0, 0)),
-		(15, (100, 100, 0)),
-		(26, (0, 100, 0)),
-		(30, (0, 0, 100))
-	]
+color_thresholds = [
+	(7,  (100, 0, 0)),
+	(8,  (75, 10, 0)),
+	(9,  (75, 30, 0)),
+	(10, (75, 50, 0)),
 
+	(11, (50, 75, 0)),
+	(12, (50, 75, 0)),
+	(14, (50, 100, 0)),
+
+	(17, (0, 100, 0)),
+	(25, (0, 100, 10)),
+	(26, (0, 100, 50)),
+	(27, (0, 75, 100)),
+	(30, (0, 0, 100))
+]
+
+def get_light_color(pixel):
 	for threshold, color in color_thresholds:
 		if pixel <= threshold:
 			return color
-
 
 def light_percent(np, percent):
 	length = len(np)
